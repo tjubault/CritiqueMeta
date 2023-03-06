@@ -1,6 +1,9 @@
 # CritiqueMeta
 This projects obtains videogames related data, in order to output interesting visualization and detect biases. We will gather data from metacritic.
 
+Direct link to the analysis page: 
+https://tjubault.github.io/CritiqueMeta/data_analysis.html
+
 ### 1 - Data gatherer
 The first step is to get the data from metacritic website. 
 
