@@ -2,3 +2,5 @@ old_data/games.csv
 old_data/meta_reviews.csv
 old_data/reviews.csv
 old_data/user_reviews.csv
+.DS_Store
+.DS_Store
