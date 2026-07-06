@@ -1,7 +1,21 @@
-old_data/games.csv
-old_data/meta_reviews.csv
-old_data/reviews.csv
-old_data/user_reviews.csv
 .DS_Store
-.DS_Store
+.venv/
+__pycache__/
+
+# checkpoints bruts de scraping (volumineux, régénérables)
+raw_data/catalog_*.jsonl
+raw_data/details.jsonl
+raw_data/user_stats.jsonl
+raw_data/critic_reviews.jsonl
+raw_data/user_reviews.jsonl
+raw_data/opencritic.jsonl
+raw_data/*.done
+raw_data/*.complete
+
+# datasets consolidés : les parquet sont versionnés, pas les CSV (lourds)
+data/*.csv
+!data/opencritic.csv
+
+# héritage
+old_data/
 data_analysis_fr.html

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "streamlit",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd /Users/tjubault/Documents/Projects/CritiqueMeta/.claude/worktrees/ecstatic-meitner-1c5cfe && exec .venv/bin/python -m streamlit run app/Accueil.py --server.port \"$PORT\" --server.headless true"],
+      "autoPort": true
+    }
+  ]
+}
