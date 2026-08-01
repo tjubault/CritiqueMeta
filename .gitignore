@@ -19,3 +19,4 @@ data/*.csv
 # héritage
 old_data/
 data_analysis_fr.html
+.DS_Store
