@@ -5,7 +5,7 @@ import plotly.express as px
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from common import t, load_games, load_reviews, scored  # noqa: E402
+from common import t, load_games, load_reviews, scored, CATEGORY_ORDERS  # noqa: E402
 
 st.title(t("Critic publications", "Rédactions critiques"))
 
@@ -66,15 +66,6 @@ fig.add_vline(x=0, line_color="red", line_width=1)
 fig.update_layout(height=600)
 st.plotly_chart(fig, use_container_width=True)
 
-fig = px.bar(big.sort_values("num_reviews", ascending=False),
-             x="critic", y="num_reviews", color="avg_score",
-             labels={"num_reviews": t("Games reviewed", "Jeux testés"),
-                     "critic": t("publication", "rédaction"),
-                     "avg_score": t("avg score", "note moyenne")},
-             title=t("Games reviewed per publication", "Jeux testés par rédaction"))
-fig.update_xaxes(visible=False)
-st.plotly_chart(fig, use_container_width=True)
-
 st.markdown(t("### Score distribution of one publication",
               "### Distribution des notes d'une rédaction"))
 pick = st.selectbox(t("Publication", "Rédaction"),
@@ -87,3 +78,27 @@ if pick:
                        title=t(f"Score distribution for {pick} ({len(sel):,} reviews)",
                                f"Distribution des notes de {pick} ({len(sel):,} avis)"))
     st.plotly_chart(fig, use_container_width=True)
+
+    dated = sel.dropna(subset=["date"]).copy()
+    if not dated.empty:
+        dated["year"] = dated["date"].dt.year
+
+        by_year_plat = dated.groupby(["year", "platform"]).size().reset_index(name="reviews")
+        fig = px.bar(by_year_plat, x="year", y="reviews", color="platform",
+                     category_orders=CATEGORY_ORDERS,
+                     labels={"year": t("year", "année"),
+                             "reviews": t("reviews", "avis")},
+                     title=t(f"Games reviewed per year by platform — {pick}",
+                             f"Jeux évalués par année et plateforme — {pick}"))
+        st.plotly_chart(fig, use_container_width=True)
+
+        avg_by_year = dated.groupby("year")["score"].mean().reset_index()
+        fig = px.line(avg_by_year, x="year", y="score",
+                      labels={"year": t("year", "année"),
+                              "score": t("avg score", "note moyenne")},
+                      title=t(f"Average score over time — {pick}",
+                              f"Note moyenne au cours du temps — {pick}"))
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info(t(f"No dated reviews for {pick}.",
+                  f"Pas de dates disponibles pour {pick}."))

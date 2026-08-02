@@ -11,9 +11,10 @@ import streamlit as st
 st.set_page_config(page_title="CritiqueMeta", page_icon="🎮", layout="wide")
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import t, lang_selector  # noqa: E402
+from common import t, lang_selector, glossary_css  # noqa: E402
 
 lang_selector()
+glossary_css()
 
 pg = st.navigation([
     st.Page("pages/Home.py", title=t("Home", "Accueil"), icon="🏠", default=True),
@@ -23,6 +24,5 @@ pg = st.navigation([
     st.Page("pages/Critics.py", title=t("Critics", "Critiques"), icon="📰"),
     st.Page("pages/Developers.py", title=t("Developers", "Développeurs"), icon="🏗️"),
     st.Page("pages/Trends.py", title=t("Trends", "Tendances"), icon="📈"),
-    st.Page("pages/OpenCritic.py", title="OpenCritic", icon="⚖️"),
 ])
 pg.run()

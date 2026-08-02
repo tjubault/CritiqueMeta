@@ -31,6 +31,20 @@ fig = px.line(tmp, x="year", y="mean", error_y="std",
 fig.add_hline(y=0, line_color="red", line_width=1)
 st.plotly_chart(fig, use_container_width=True)
 
+st.markdown(t(
+    """
+The average offset trends slightly upward over time — critics and users
+seem to be drifting apart. However, the standard deviation bands are wide
+and the trend is **not statistically significant**: year-to-year noise
+dominates any underlying shift.
+""",
+    """
+L'offset moyen tend légèrement à la hausse au fil du temps — critiques et
+joueurs semblent s'éloigner. Cependant, les bandes d'écart-type sont larges
+et la tendance n'est **pas statistiquement significative** : le bruit
+d'une année à l'autre domine tout déplacement sous-jacent.
+"""))
+
 tmp = d.groupby(["year", "platform"])["offset"].mean().reset_index()
 fig = px.line(tmp, x="year", y="offset", color="platform",
               category_orders=CATEGORY_ORDERS,
@@ -40,15 +54,17 @@ fig = px.line(tmp, x="year", y="offset", color="platform",
 st.plotly_chart(fig, use_container_width=True)
 
 st.markdown(t("### Every game through time", "### Tous les jeux dans le temps"))
-metric = st.radio("Metric", ["meta_score", "n_user_score", "offset"], horizontal=True,
-                  label_visibility="collapsed",
-                  format_func=lambda m: {
-                      "meta_score": "Metascore",
-                      "n_user_score": t("User score", "Note joueurs"),
-                      "offset": "Offset"}[m])
-fig = px.scatter(d, x="release_date", y=metric, color="platform", trendline="ols",
-                 hover_data=["title"], category_orders=CATEGORY_ORDERS,
-                 labels={"release_date": t("Release date", "Date de sortie")},
-                 title=t(f"{metric} through time", f"{metric} dans le temps"))
-fig.update_layout(height=600)
-st.plotly_chart(fig, use_container_width=True)
+
+for metric, label_en, label_fr in [
+    ("meta_score", "Metascore", "Metascore"),
+    ("n_user_score", "User score", "Note joueurs"),
+    ("offset", "Offset", "Offset"),
+]:
+    fig = px.scatter(d, x="release_date", y=metric, color="platform", trendline="ols",
+                     hover_data=["title"], category_orders=CATEGORY_ORDERS,
+                     labels={"release_date": t("Release date", "Date de sortie"),
+                             metric: t(label_en, label_fr)},
+                     title=t(f"{label_en} through time",
+                             f"{label_fr} dans le temps"))
+    fig.update_layout(height=500)
+    st.plotly_chart(fig, use_container_width=True)

@@ -5,8 +5,8 @@ import plotly.express as px
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from common import (t, load_games, sidebar_filters, scored, long_scores,  # noqa: E402
-                    dataset_caption)
+from common import (t, load_games, sidebar_filters, scored,  # noqa: E402
+                    dataset_caption, CATEGORY_ORDERS)
 
 st.title(t("Developers", "Développeurs"))
 
@@ -77,13 +77,35 @@ pick = st.selectbox(t("Developer", "Studio"),
                     dev.sort_values("num_games", ascending=False)["developer"],
                     index=None, placeholder=t("Choose a studio…", "Choisissez un studio…"))
 if pick:
-    df3 = long_scores(df)
-    tmp = (df3[df3["developer"] == pick]
-           .groupby(["title", "score type", "first_release"])["score"].mean()
-           .reset_index().sort_values("first_release"))
-    fig = px.histogram(tmp, x="title", y="score", color="score type", barmode="group",
-                       category_orders={"score type": ["meta", "user"]},
-                       title=t(f"Meta vs user scores — {pick}",
-                               f"Notes méta vs joueurs — {pick}"))
-    fig.update_yaxes(title="score")
+    studio_games = d[d["developer"] == pick].sort_values("year", ascending=False)
+
+    st.dataframe(
+        studio_games[["title", "platform", "year", "meta_score", "n_user_score",
+                       "offset", "meta_count", "user_count", "ratio"]],
+        use_container_width=True, hide_index=True, height=400,
+        column_config={
+            "n_user_score": st.column_config.NumberColumn(
+                t("user score", "note joueurs"), format="%.0f"),
+            "meta_score": st.column_config.NumberColumn("metascore"),
+            "offset": st.column_config.NumberColumn(format="%.0f"),
+            "ratio": st.column_config.NumberColumn(format="%.1f"),
+        },
+    )
+
+    by_year = studio_games.groupby("year").agg(
+        meta=("meta_score", "mean"), user=("n_user_score", "mean")).reset_index()
+    fig = px.line(by_year, x="year", y=["meta", "user"],
+                  labels={"year": t("year", "année"), "value": t("score", "note"),
+                          "variable": t("score type", "type de note")},
+                  title=t(f"Average scores over time — {pick}",
+                          f"Notes moyennes au cours du temps — {pick}"))
+    fig.update_layout(height=400)
+    st.plotly_chart(fig, use_container_width=True)
+
+    vol_plat = studio_games.groupby(["year", "platform"]).size().reset_index(name="games")
+    fig = px.bar(vol_plat, x="year", y="games", color="platform",
+                 category_orders=CATEGORY_ORDERS,
+                 labels={"year": t("year", "année"), "games": t("games", "jeux")},
+                 title=t(f"Games released per year by platform — {pick}",
+                         f"Jeux sortis par année et plateforme — {pick}"))
     st.plotly_chart(fig, use_container_width=True)
