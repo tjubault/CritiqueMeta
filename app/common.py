@@ -43,6 +43,57 @@ def lang_selector():
                 st.rerun()
 
 
+# --------------------------------------------------------------------------- glossaire
+
+def glossary_css():
+    """Injecte le style des termes du glossaire (couleur + italique + info-bulle)."""
+    st.markdown(
+        """
+<style>
+.glossary-term {
+    color: #4fc3f7;
+    font-style: italic;
+    cursor: help;
+    border-bottom: 1px dotted #4fc3f7;
+}
+</style>
+""",
+        unsafe_allow_html=True)
+
+
+_TERMS = {
+    "metascore": {
+        "label": ("Metascore", "Metascore"),
+        "def": ("Weighted average of professional critic reviews (0-100).",
+                "Moyenne pondérée des critiques professionnelles (0-100)."),
+    },
+    "user_score": {
+        "label": ("User score", "Note joueurs"),
+        "def": ("Average of user ratings (0-10, shown x10 to match the Metascore scale).",
+                "Moyenne des notes des joueurs (0-10, affichée x10 pour être comparable "
+                "au Metascore)."),
+    },
+    "offset": {
+        "label": ("Offset", "Offset"),
+        "def": ("Metascore minus (-) user score.",
+                "Metascore moins (-) note joueurs."),
+    },
+    "ratio": {
+        "label": ("Ratio", "Ratio"),
+        "def": ("(Number of user ratings) divided by (number of critic reviews).",
+                "(Nombre de notes joueurs) divisé par (nombre d'avis critique pro)."),
+    },
+}
+
+
+def term(key, label=None):
+    """Span coloré + italique avec la définition du terme affichée au survol."""
+    spec = _TERMS[key]
+    label = label if label is not None else t(*spec["label"])
+    definition = t(*spec["def"])
+    return f'<span class="glossary-term" title="{definition}">{label}</span>'
+
+
 # --------------------------------------------------------------------------- data
 
 @st.cache_data(show_spinner="Loading dataset…")
