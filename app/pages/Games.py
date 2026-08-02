@@ -6,9 +6,9 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common import (t, load_games, load_reviews, sidebar_filters, scored,  # noqa: E402
-                    dataset_caption, CATEGORY_ORDERS)
+                    dataset_caption, CATEGORY_ORDERS, term)
 
-st.title(t("Game by game", "Jeu par jeu"))
+st.title(t("Game viewpoint", "Point de vue jeu"))
 
 df = sidebar_filters(load_games())
 d = scored(df)
@@ -19,19 +19,21 @@ tab_scatter, tab_explorer = st.tabs([t("Meta vs user scatter", "Nuage méta vs j
 
 with tab_scatter:
     st.markdown(t(
-        """
+        f"""
 Each point is a game on a platform: **X = Metascore, Y = user score**. On the white
 diagonal both agree; *below* it users were harsher than critics, *above* it they were
-more generous. Circle size is the **ratio** (user ratings per critic review) — big
-circles flag review-bombing candidates. Click legend items to toggle platforms.
+more generous. Circle size is the {term("ratio", "ratio")} (user ratings per critic
+review) — big circles flag review-bombing candidates. Click legend items to toggle
+platforms.
 """,
-        """
+        f"""
 Chaque point est un jeu sur une plateforme : **X = Metascore, Y = note joueurs**. Sur
 la diagonale blanche, tout le monde est d'accord ; *en dessous*, les joueurs ont été
 plus durs que la critique, *au-dessus*, plus généreux. La taille du cercle est le
-**ratio** (notes joueurs par avis critique) — les gros cercles signalent les
-candidats au review bombing. Cliquez sur la légende pour filtrer les plateformes.
-"""))
+{term("ratio", "ratio")} (notes joueurs par avis critique) — les gros cercles
+signalent les candidats au review bombing. Cliquez sur la légende pour filtrer les
+plateformes.
+"""), unsafe_allow_html=True)
     has_ratio = d["ratio"].notna()
     min_ratio = st.slider(t("Only games with ratio ≥", "Seulement les jeux au ratio ≥"),
                           0, 100, 0,
@@ -50,14 +52,6 @@ candidats au review bombing. Cliquez sur la légende pour filtrer les plateforme
     fig.add_shape(type="line", x0=0, y0=0, x1=100, y1=100, line=dict(color="white", width=1))
     fig.update_layout(height=650)
     st.plotly_chart(fig, use_container_width=True)
-
-    r = d[has_ratio]
-    if not r.empty:
-        fig = px.scatter(r, x="ratio", y="offset", color="platform", trendline="ols",
-                         hover_data=["title"], category_orders=CATEGORY_ORDERS,
-                         title=t("Offset vs ratio per game", "Offset vs ratio par jeu"),
-                         log_x=True)
-        st.plotly_chart(fig, use_container_width=True)
 
 with tab_explorer:
     search = st.text_input(t("Search a title", "Chercher un titre"))
