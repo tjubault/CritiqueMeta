@@ -42,20 +42,6 @@ with tab_vol:
                           "Titres sortis par an (cycles de vie des plateformes)"))
     st.plotly_chart(fig, use_container_width=True)
 
-    st.markdown(t(
-        "Release cycle over a calendar year — the November peak (holiday "
-        "season) shows on every platform, with a smaller one in March.",
-        "Cycle de sortie sur une année civile — le pic de novembre (fêtes de fin "
-        "d'année) apparaît sur toutes les plateformes, avec un pic secondaire en mars."))
-    tmp = df.groupby(["month", "platform"]).size().reset_index(name="titles")
-    fig = px.line(tmp, x="month", y="titles", color="platform",
-                  category_orders=CATEGORY_ORDERS,
-                  labels={"titles": t("titles", "titres"), "month": t("month", "mois")},
-                  title=t("Titles released per month of the year (all years combined)",
-                          "Titres sortis par mois de l'année (toutes années confondues)"))
-    fig.update_xaxes(dtick=1)
-    st.plotly_chart(fig, use_container_width=True)
-
 with tab_scores:
     st.markdown(t(
         "Meta and user score distributions side by side, per platform. For most "
@@ -80,4 +66,13 @@ with tab_scores:
                          "Distribution de l'offset par plateforme"))
     fig.update_layout(showlegend=False,
                       height=max(500, 40 * d["platform"].nunique()))
+    st.plotly_chart(fig, use_container_width=True)
+
+    avg_off = (d.groupby("platform")["offset"].mean().reset_index()
+               .sort_values("offset", ascending=True))
+    fig = px.bar(avg_off, x="offset", y="platform", orientation="h", color="offset",
+                 color_continuous_scale="RdBu_r", color_continuous_midpoint=0,
+                 title=t("Average offset per platform",
+                         "Offset moyen par plateforme"))
+    fig.update_layout(height=max(400, 35 * len(avg_off)), showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
