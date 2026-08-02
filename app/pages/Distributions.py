@@ -7,7 +7,7 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common import (t, load_games, sidebar_filters, scored, long_scores,  # noqa: E402
-                    dataset_caption)
+                    dataset_caption, term, CATEGORY_ORDERS)
 
 st.title(t("Score distributions", "Distributions des notes"))
 
@@ -30,6 +30,10 @@ Notez les points d'accumulation — les joueurs adorent les chiffres ronds comme
 tandis que 80 est le mode de la distribution des Metascores.
 """))
 
+c1, c2 = st.columns(2)
+c1.metric(t("Average Metascore", "Metascore moyen"), f"{d['meta_score'].mean():.1f}")
+c2.metric(t("Average user score", "Note joueurs moyenne"), f"{d['n_user_score'].mean():.1f}")
+
 df3 = long_scores(df)
 fig = px.histogram(df3, x="score", color="score type", barmode="overlay", marginal="box",
                    title=t("Distribution of meta and user ratings",
@@ -46,22 +50,22 @@ if len(d) > 10:
     st.plotly_chart(fig, use_container_width=True)
 
 st.markdown(t(
-    """
-### Offset distribution
+    f"""
+### {term("offset")} distribution
 
-**Offset** = Metascore − user score, per game. The higher the offset, the more the
-game is *overrated by critics* relative to users (negative offset → users were more
-generous). The distribution leans right: more games are overrated by critics than
-the other way around.
+**{term("offset")}** = Metascore minus (-) user score, per game. The higher the offset,
+the more the game is *overrated by critics* relative to users (negative offset → users
+were more generous). The distribution leans right: more games are overrated by critics
+than the other way around.
 """,
-    """
-### Distribution de l'offset
+    f"""
+### Distribution de l'{term("offset")}
 
-**Offset** = Metascore − note joueurs, par jeu. Plus l'offset est grand, plus le jeu
-est *survalorisé par la critique* par rapport aux joueurs (offset négatif → les
-joueurs ont été plus généreux). La distribution penche à droite : les jeux
-survalorisés par la critique sont plus nombreux que l'inverse.
-"""))
+**{term("offset")}** = Metascore moins (-) note joueurs, par jeu. Plus l'offset est
+grand, plus le jeu est *survalorisé par la critique* par rapport aux joueurs (offset
+négatif → les joueurs ont été plus généreux). La distribution penche à droite : les
+jeux survalorisés par la critique sont plus nombreux que l'inverse.
+"""), unsafe_allow_html=True)
 
 fig = px.histogram(d, x="offset", title=t("Offset distribution", "Distribution de l'offset"),
                    labels={"offset": t("Offset value", "Valeur de l'offset")})
@@ -69,28 +73,45 @@ fig.add_vline(x=0, line_color="red", line_width=1)
 st.plotly_chart(fig, use_container_width=True)
 
 st.markdown(t(
-    """
-### Ratio distribution
+    f"""
+### {term("ratio")} distribution
 
-**Ratio** = number of user ratings ÷ number of critic reviews. A ratio of 1 means as
-many users rated the game as there were professional reviews. High ratios flag games
-where users showed up *en masse* — often review bombing (or a passionate fanbase).
+**{term("ratio")}** = number of user ratings ÷ number of critic reviews. A ratio of 1
+means as many users rated the game as there were professional reviews. High ratios
+flag games where users showed up *en masse* — often review bombing (or a passionate
+fanbase).
 """,
-    """
-### Distribution du ratio
+    f"""
+### Distribution du {term("ratio")}
 
-**Ratio** = nombre de notes joueurs ÷ nombre d'avis critiques. Un ratio de 1 signifie
-autant de joueurs votants que de critiques professionnelles. Les ratios élevés
+**{term("ratio")}** = nombre de notes joueurs ÷ nombre d'avis critiques. Un ratio de 1
+signifie autant de joueurs votants que de critiques professionnelles. Les ratios élevés
 signalent les jeux où les joueurs ont afflué *en masse* — souvent du review bombing
 (ou une communauté passionnée).
-"""))
+"""), unsafe_allow_html=True)
 
 r = d[d["ratio"].notna()]
 if r.empty:
     st.info(t("Ratio requires user rating counts — run `scrape.py user-stats` to collect them.",
               "Le ratio nécessite les compteurs de notes joueurs — lancer `scrape.py user-stats`."))
 else:
+    st.metric(t("Average ratio", "Ratio moyen"), f"{r['ratio'].mean():.1f}")
+
     cap = st.slider(t("Clip ratio axis at", "Tronquer l'axe du ratio à"), 10, 500, 100)
     fig = px.histogram(r[r["ratio"] <= cap], x="ratio",
                        title=t("Ratio distribution", "Distribution du ratio"))
+    st.plotly_chart(fig, use_container_width=True)
+
+    tmp = r.groupby("year")["ratio"].mean().reset_index()
+    fig = px.line(tmp, x="year", y="ratio",
+                  labels={"year": t("year", "année")},
+                  title=t("Average ratio per year", "Ratio moyen par année"))
+    st.plotly_chart(fig, use_container_width=True)
+
+    tmp = r.groupby(["year", "platform"])["ratio"].mean().reset_index()
+    fig = px.line(tmp, x="year", y="ratio", color="platform",
+                  category_orders=CATEGORY_ORDERS,
+                  labels={"year": t("year", "année")},
+                  title=t("Average ratio per platform, per year",
+                          "Ratio moyen par plateforme et par année"))
     st.plotly_chart(fig, use_container_width=True)
