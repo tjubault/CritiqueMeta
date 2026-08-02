@@ -49,11 +49,12 @@ if len(d) > 10:
                               "Distributions lissées (KDE)"))
     st.plotly_chart(fig, use_container_width=True)
 
+active_platforms = [p for p in CATEGORY_ORDERS["platform"] if p in df3["platform"].unique()]
 fig = px.box(df3, x="score", y="platform", color="score type", hover_name="title",
-             category_orders=CATEGORY_ORDERS,
+             category_orders={"platform": active_platforms, "score type": ["meta", "user"]},
              title=t("Score distributions per platform",
                      "Distributions des notes par plateforme"))
-fig.update_layout(height=max(500, 60 * df3["platform"].nunique()))
+fig.update_layout(height=max(500, 60 * len(active_platforms)))
 st.plotly_chart(fig, use_container_width=True)
 
 st.markdown(t(
@@ -103,19 +104,6 @@ if r.empty:
               "Le ratio nécessite les compteurs de notes joueurs — lancer `scrape.py user-stats`."))
 else:
     st.metric(t("Average ratio", "Ratio moyen"), f"{r['ratio'].mean():.1f}")
-
-    c_min, c_max = st.columns(2)
-    with c_min:
-        min_r = st.slider(t("Show ratio ≥", "Afficher ratio ≥"), 0, 100, 0,
-                          help=t("Filter out low-ratio games", "Exclure les jeux à faible ratio"))
-    with c_max:
-        cap = st.slider(t("Clip ratio axis at", "Tronquer l'axe du ratio à"), 10, 500, 100)
-    plot_r = r[(r["ratio"] >= min_r) & (r["ratio"] <= cap)]
-    fig = px.histogram(plot_r, x="ratio",
-                       title=t("Ratio distribution (log scale)",
-                               "Distribution du ratio (échelle log)"))
-    fig.update_xaxes(type="log")
-    st.plotly_chart(fig, use_container_width=True)
 
     tmp = r.groupby("year")["ratio"].mean().reset_index()
     fig = px.line(tmp, x="year", y="ratio",

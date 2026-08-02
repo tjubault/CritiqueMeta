@@ -55,6 +55,8 @@ plateformes.
                      title=t("Meta and user scores per game & platform",
                              "Notes méta et joueurs par jeu et plateforme"))
     fig.add_shape(type="line", x0=0, y0=0, x1=100, y1=100, line=dict(color="white", width=1))
+    if size is None:
+        fig.update_traces(marker=dict(size=6), selector=dict(mode="markers"))
     fig.update_layout(height=650)
     st.plotly_chart(fig, use_container_width=True)
 

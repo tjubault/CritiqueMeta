@@ -92,14 +92,6 @@ if pick:
                              f"Jeux évalués par année et plateforme — {pick}"))
         st.plotly_chart(fig, use_container_width=True)
 
-        by_year = dated.groupby("year").size().reset_index(name="reviews")
-        fig = px.bar(by_year, x="year", y="reviews",
-                     labels={"year": t("year", "année"),
-                             "reviews": t("reviews", "avis")},
-                     title=t(f"Total games reviewed per year — {pick}",
-                             f"Total jeux évalués par année — {pick}"))
-        st.plotly_chart(fig, use_container_width=True)
-
         avg_by_year = dated.groupby("year")["score"].mean().reset_index()
         fig = px.line(avg_by_year, x="year", y="score",
                       labels={"year": t("year", "année"),

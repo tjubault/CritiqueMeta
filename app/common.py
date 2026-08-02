@@ -129,6 +129,9 @@ def sidebar_filters(df, key_prefix=""):
 
     platforms = sorted(df["platform"].unique(), key=lambda p: PLATFORM_ORDER.index(p)
                        if p in PLATFORM_ORDER else 99)
+    if st.sidebar.button(t("Select all platforms", "Toutes les plateformes"),
+                         key=f"{key_prefix}all_platforms"):
+        st.session_state[f"{key_prefix}platforms"] = platforms
     chosen = st.sidebar.multiselect(t("Platforms", "Plateformes"), platforms,
                                     default=platforms, key=f"{key_prefix}platforms")
 
@@ -138,7 +141,7 @@ def sidebar_filters(df, key_prefix=""):
                                 (y_min, y_max), key=f"{key_prefix}years")
 
     min_critics = st.sidebar.slider(
-        t("Min. critic reviews", "Min. d'avis critiques"), 0, 30, 0,
+        t("Min. critic reviews", "Min. d'avis critiques"), 0, 30, 10,
         key=f"{key_prefix}mincritics",
         help=t("Keep games with at least N critic reviews",
                "Ne garder que les jeux ayant au moins N avis critiques"))

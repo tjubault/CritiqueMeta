@@ -109,10 +109,3 @@ if pick:
                  title=t(f"Games released per year by platform — {pick}",
                          f"Jeux sortis par année et plateforme — {pick}"))
     st.plotly_chart(fig, use_container_width=True)
-
-    vol_all = studio_games.groupby("year").size().reset_index(name="games")
-    fig = px.bar(vol_all, x="year", y="games",
-                 labels={"year": t("year", "année"), "games": t("games", "jeux")},
-                 title=t(f"Total games released per year — {pick}",
-                         f"Total jeux sortis par année — {pick}"))
-    st.plotly_chart(fig, use_container_width=True)
