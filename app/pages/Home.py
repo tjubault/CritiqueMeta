@@ -34,12 +34,15 @@ PC inclus), collecté via l'API JSON de Metacritic.
 df = load_games()
 d = scored(df)
 
-c1, c2, c3, c4 = st.columns(4)
+r = d[d["ratio"].notna()]
+c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric(t("Title-platform entries", "Entrées titre-plateforme"), f"{len(df):,}")
 c2.metric(t("With both scores", "Avec les deux notes"), f"{len(d):,}")
 c3.metric(t("Platforms", "Plateformes"), df["platform"].nunique())
 c4.metric(t("Avg offset (meta − user)", "Offset moyen (méta − joueurs)"),
           f"{d['offset'].mean():+.1f}")
+c5.metric(t("Avg ratio", "Ratio moyen"),
+          f"{r['ratio'].mean():.1f}" if not r.empty else "—")
 
 st.markdown(t(
     f"""

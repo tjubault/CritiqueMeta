@@ -24,6 +24,5 @@ pg = st.navigation([
     st.Page("pages/Critics.py", title=t("Critics", "Critiques"), icon="📰"),
     st.Page("pages/Developers.py", title=t("Developers", "Développeurs"), icon="🏗️"),
     st.Page("pages/Trends.py", title=t("Trends", "Tendances"), icon="📈"),
-    st.Page("pages/OpenCritic.py", title="OpenCritic", icon="⚖️"),
 ])
 pg.run()
