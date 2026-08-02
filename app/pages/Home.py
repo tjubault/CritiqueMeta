@@ -9,7 +9,11 @@ from common import t, load_games, scored, dataset_caption, term  # noqa: E402
 st.title("🎮 CritiqueMeta")
 st.markdown(t(
     """
-*A walk around Metacritic scores for video games.*
+*An interactive exploration of Metacritic scores for video games.*
+
+Metacritic aggregates professional critic reviews and user ratings for video games,
+giving each title a weighted **Metascore** out of 100. This app digs into the data
+to answer a few questions:
 
 - **Are users getting tougher?**
 - **Are ratings constantly increasing?**
@@ -20,7 +24,11 @@ The dataset covers the entire Metacritic games catalog (all platforms, PC includ
 collected through Metacritic's JSON API.
 """,
     """
-*Une promenade dans les notes Metacritic des jeux vidéo.*
+*Une exploration interactive des notes Metacritic des jeux vidéo.*
+
+Metacritic agrège les critiques professionnelles et les notes des joueurs pour les
+jeux vidéo, attribuant à chaque titre un **Metascore** pondéré sur 100. Cette app
+creuse les données pour répondre à quelques questions :
 
 - **Les joueurs deviennent-ils plus sévères ?**
 - **Les notes augmentent-elles sans cesse ?**
@@ -77,3 +85,19 @@ dataset_caption(df)
 st.caption(t(
     f"Most recent release in dataset: {df['release_date'].max():%B %d, %Y}",
     f"Sortie la plus récente du jeu de données : {df['release_date'].max():%d/%m/%Y}"))
+
+st.divider()
+
+st.markdown(t(
+    """
+**About** — A side project by [Thomas Jubault](https://www.linkedin.com/in/thomasjubault/).
+Data collected from Metacritic's public API; analysis and visualization built with
+Python, pandas, Plotly and Streamlit.
+[Source code on GitHub](https://github.com/tjubault/CritiqueMeta).
+""",
+    """
+**À propos** — Un projet perso de [Thomas Jubault](https://www.linkedin.com/in/thomasjubault/).
+Données collectées via l'API publique de Metacritic ; analyse et visualisation
+réalisées avec Python, pandas, Plotly et Streamlit.
+[Code source sur GitHub](https://github.com/tjubault/CritiqueMeta).
+"""))
